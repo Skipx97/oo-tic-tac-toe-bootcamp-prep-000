@@ -114,7 +114,7 @@ def winner()
     else
       return "O"
     end
-  end
+
   else
     nil
   end
