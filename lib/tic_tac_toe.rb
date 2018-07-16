@@ -139,4 +139,3 @@ turn()
     puts "Wolf's Game"
 end
 end
-end
