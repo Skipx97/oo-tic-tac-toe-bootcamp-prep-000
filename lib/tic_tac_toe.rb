@@ -137,4 +137,3 @@ turn()
     puts "Congratulations #{winner()}"
   elsif (draw?())
     puts "Wolf's Game"
- end
