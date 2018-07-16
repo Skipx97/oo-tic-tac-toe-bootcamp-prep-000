@@ -138,4 +138,3 @@ turn()
   elsif (draw?())
     puts "Wolf's Game"
  end
-end
