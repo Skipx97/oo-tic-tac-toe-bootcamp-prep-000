@@ -1,119 +1,141 @@
 class TicTacToe
-  def initialize()
-    @board = [" ", " ", " ", " ", " ", " ", " ", " ", " "]
+
+  def initialize
+    @board =  board || Array.new(9, " ")
   end
 
-  def display_board
-    cells = []
-    rows = []
-    separater = "-----------" + "\n"
-    @board.length.times do |i|
-      cells[i] = " #{@board[i]} "
+  WIN_COMBINATIONS = [
+    [0,1,2],
+    [3,4,5],
+    [6,7,8],
+    [0,3,6],
+    [1,4,7],
+    [2,5,8],
+    [0,4,8],
+    [2,4,6]
+  ]
+
+  def display_board()
+   puts " #{@board[0]} | #{@board[1]} | #{@board[2]} "
+   puts "-----------"
+   puts " #{@board[3]} | #{@board[4]} | #{@board[5]} "
+   puts "-----------"
+   puts " #{@board[6]} | #{@board[7]} | #{@board[8]} "
+  end
+
+
+def input_to_index(user_input)
+  user_input.to_i - 1
+end
+
+def move(index, current_player = "X")
+  board[index] = current_player
+end
+
+def position_taken?(location)
+  @board[location] != " " && @board[location] != ""
+end
+
+def valid_move?(index)
+  index.between?(0,8) && !position_taken?(index)
+end
+
+def turn()
+  puts "Please enter 1-9:"
+  input = gets.strip
+  index = input_to_index(input)
+  if valid_move?(index)
+    move(index, current_player())
+    display_board()
+  else
+    turn()
+  end
+end
+
+def turn_count()
+  count = 0
+  @board.each do |str|
+    if(str == "X" || str == "O")
+      count += 1
     end
-    for i in 0..2
-      rows[i] = "#{cells[3*i]}" + "|" + "#{cells[3*i + 1]}" + "|" + "#{cells[3*i + 2]}" + "\n"
-    end
-    print rows[0], separater, rows[1], separater, rows[2]
   end
+  return count
+end
 
-  def input_to_index(input)
-    index = input.to_i - 1
-    return index
-  end
-
-  def move(index, character)
-    @board[index] = character
-    return @board
-  end
-
-
-  def valid_move?(index)
-    if index.between?(0,8) && (!position_taken?(index))
-      return TRUE
+def current_player
+    if turn_count % 2 == 0
+      "X"
     else
-      return FALSE
+      "O"
     end
-  end
+ end
 
-  def turn
-    puts "Please enter 1-9:"
-    input = gets
-    index = input_to_index(input)
-    if valid_move?(index)
-      move(index, current_player)
-      display_board
+def won?()
+  WIN_COMBINATIONS.each do |win_combo|
+    win_index_1 = win_combo[0]
+    win_index_2 = win_combo[1]
+    win_index_3 = win_combo[2]
+    pos_1 = @board[win_index_1]
+    pos_2 = @board[win_index_2]
+    pos_3 = @board[win_index_3]
+    if ((pos_1 == "X" && pos_2 == "X" && pos_3 == "X") ||   (pos_1 == "O" && pos_2 == "O" && pos_3 == "O"))
+      return [win_index_1, win_index_2, win_index_3]
     else
-      turn
+      false
     end
   end
+  false
+end
 
-  def position_taken?(index)
-    if @board[index] == " " || @board[index] == "" || @board[index] == nil
-      return false
-    elsif @board[index] == "X" or @board[index] || "O"
-      return true
-    end
+def full?()
+  @board.all? {|pos| pos == "X" || pos == "O"}
+end
+
+def draw?()
+  if(full?() && !won?())
+    true
+  else
+    false
   end
+end
 
-  def won?
-    WIN_COMBINATIONS.each do |win_combination|
-      win_index_1 = win_combination[0]
-      win_index_2 = win_combination[1]
-      win_index_3 = win_combination[2]
-      position_1 = @board[win_index_1]
-      position_2 = @board[win_index_2]
-      position_3 = @board[win_index_3]
-      if (position_1 == "X" && position_2 == "X" && position_3 == "X") || (position_1 == "O" && position_2 == "O" && position_3 == "O")
-        return win_combination
-      end
-    end
-    return false
+def over?()
+  if(full?() || draw?() || won?())
+    true
+  else
+    false
   end
+end
 
-  def full?
-    @board.all?{|i| (i == "X" || i == "O")}
-  end
-
-  def draw?
-    full? && !won?
-  end
-
-  def over?
-    draw? || won?
-  end
-
-  def winner
-    if won?
-      return @board[won?[0]]
-    end
-  end
-
-  def turn_count
-    turns = 0
-    @board.each do |square|
-      if square == "X" || square == "O"
-        turns += 1
-      end
-    end
-    return turns
-  end
-
-  def current_player
-    return turn_count % 2 == 0 ? "X" : "O"
-  end
-
-  def play
-    until over?
-      turn
-    end
-
-    if won?
-      puts "Congratulations #{winner}!"
+def winner()
+  if(won?)
+    if(@board[won?()[0]] == "X")
+      return "X"
     else
-      puts "Cat's Game!"
+      return "O"
     end
-  end
-  # Define your WIN_COMBINATIONS constant
-  WIN_COMBINATIONS = [[0, 1, 2],[3, 4, 5],[6, 7, 8],[0, 3, 6],[1, 4, 7],[2, 5, 8],[0, 4, 8],[2, 4, 6]]
 
+  else
+    nil
+  end
+end
+
+def current_player()
+  if(turn_count() % 2 == 0)
+    return "X"
+  else
+    return "O"
+ end
+end
+
+def play()
+  until over?()
+turn()
+  end
+
+  if(won?())
+    puts "Congratulations #{winner()}"
+  elsif (draw?())
+    puts "Wolf's Game"
+end
 end
